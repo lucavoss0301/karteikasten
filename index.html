@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Karteikasten</title>
+<meta name="description" content="Karteikarten für Wirtschaftsinformatik an der HS Bremerhaven: Programmierung I, Mathe 1, Graphen & Automaten.">
+<meta name="theme-color" content="#2f5bd3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Karteikasten">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=STIX+Two+Text:wght@400;600&display=swap">
+<style>
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+
+/* Layout: one narrow column on grid paper; subject sections with progress bars; an index card in the learning view. */
+:root{
+  --paper:#eef2f8; --grid:#d7e0ee; --ink:#1c2a4a; --muted:#5d6b88;
+  --card:#ffffff; --card-ink:#14203b; --line:#c9d3e4; --soft:#f5f7fb;
+  --accent:#2f5bd3; --accent-ink:#ffffff; --marker:#ffe27a;
+  --ok:#1f8a4c; --ok-bg:#e3f4ea; --bad:#c23a32; --bad-bg:#fbe7e5;
+  --track:#e4e9f2;
+  --c-prog:#2f5bd3; --c-mathe:#b4521f; --c-graph:#1f7a63; --c-own:#7a4bb5;
+  --shadow:0 1px 0 rgba(28,42,74,.06),0 8px 24px rgba(28,42,74,.10);
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+  --f-card:"STIX Two Text","Cambria Math","Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#111827;--grid:#1c2638;--ink:#e6ebf5;--muted:#9aa7c2;--card:#1a2335;--card-ink:#e9eef8;--line:#2c3850;--soft:#141c2c;
+  --accent:#7c9cff;--accent-ink:#0d1530;--marker:#f2d35c;--ok:#5fd394;--ok-bg:#163526;--bad:#ff8a80;--bad-bg:#3d1a18;--track:#263149;
+  --c-prog:#7c9cff;--c-mathe:#f09a62;--c-graph:#5cc9a7;--c-own:#c39cf2;--shadow:0 8px 28px rgba(0,0,0,.45);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111827;--grid:#1c2638;--ink:#e6ebf5;--muted:#9aa7c2;--card:#1a2335;--card-ink:#e9eef8;--line:#2c3850;--soft:#141c2c;
+  --accent:#7c9cff;--accent-ink:#0d1530;--marker:#f2d35c;--ok:#5fd394;--ok-bg:#163526;--bad:#ff8a80;--bad-bg:#3d1a18;--track:#263149;
+  --c-prog:#7c9cff;--c-mathe:#f09a62;--c-graph:#5cc9a7;--c-own:#c39cf2;--shadow:0 8px 28px rgba(0,0,0,.45);color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background-color:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:680px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.6rem;margin:0;letter-spacing:-.01em}
+h2{font-family:var(--f-display);font-size:1.2rem;margin:0;text-wrap:balance}
+h3{font-family:var(--f-display);font-size:1rem;margin:0}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
+.tabs button{border:0;white-space:nowrap;background:transparent;color:var(--card-ink);font:700 .95rem var(--f-body);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.field{display:flex;flex-direction:column;gap:4px;flex:1 1 160px;min-width:0}
+select,input[type=text],input[type=email],input[type=password],textarea{font:inherit;color:var(--card-ink);background:var(--soft);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:700 1rem var(--f-body);border-radius:12px;padding:11px 16px;border:1.5px solid var(--line);background:var(--card);color:var(--card-ink);cursor:pointer;touch-action:manipulation}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.btn.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.btn.small{padding:6px 10px;font-size:.85rem;border-radius:8px}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.panel{background:var(--card);color:var(--card-ink);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+
+/* progress */
+.bar{height:10px;border-radius:99px;background:var(--track);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:var(--hue,var(--accent));transition:width .4s}
+.bar.thin{height:6px}
+.stat{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.stat b{color:var(--card-ink)}
+
+/* subject sections */
+.fach{border-left:6px solid var(--hue)}
+.fach-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.themen{display:flex;flex-direction:column;gap:2px;margin-top:2px}
+.thema{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:10px 4px;border-top:1px solid var(--line);cursor:pointer;border-radius:6px;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;color:inherit;font:inherit;width:100%}
+.thema:hover{background:var(--soft)}
+.thema .name{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.thema .cnt{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.thema .bar{grid-column:1/-1}
+.mix{border-left:6px solid var(--card-ink)}
+.mix-bars{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--track)}
+.mix-bars>i{display:block;height:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--hue);margin-right:5px;vertical-align:-1px}
+
+/* index card */
+.stage{display:flex;flex-direction:column;gap:14px}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.chip{background:var(--marker);color:#2b2300;font-weight:700;font-size:.78rem;padding:2px 8px;border-radius:4px}
+.icard{position:relative;background:#fff;color:#14203b;border-radius:6px;box-shadow:var(--shadow);min-height:280px;padding:46px 22px 22px;cursor:pointer;display:flex;flex-direction:column;
+  background-image:linear-gradient(transparent 31px,#e7ecf5 31px,#e7ecf5 32px);background-size:100% 32px;background-position:0 46px}
+.icard::before{content:"";position:absolute;left:0;right:0;top:38px;height:2px;background:#e8a5a5}
+.icard .side{position:absolute;top:10px;left:22px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#7b879f}
+.icard .where{position:absolute;top:10px;right:18px;font-size:.72rem;color:#7b879f;max-width:55%;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icard .content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.icard .txt{font-family:var(--f-card);font-size:clamp(1.25rem,4.4vw,1.8rem);line-height:1.35;overflow-wrap:anywhere}
+.icard .txt.big{font-size:clamp(2.4rem,10vw,3.6rem)}
+.icard img{max-width:100%;max-height:200px}
+.icard.back{outline:3px solid var(--accent);outline-offset:-3px}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:0}
+.answer{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answer .btn{padding:16px;font-size:1.1rem}
+.score{text-align:center;align-items:center}
+.score .num{font-family:var(--f-display);font-size:3rem;font-weight:700;font-variant-numeric:tabular-nums}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* editor */
+.sidehead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.modes{display:flex;gap:4px}
+.modes button{font:700 .8rem var(--f-body);border:1.5px solid var(--line);background:var(--soft);color:var(--card-ink);border-radius:8px;padding:5px 10px;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--card-ink);color:var(--card);border-color:var(--card-ink)}
+.pad{position:relative;border:1.5px dashed #9fb0cf;border-radius:10px;background:#fff;overflow:hidden}
+.pad canvas{display:block;width:100%;height:190px;touch-action:none;cursor:crosshair}
+.pad .clear{position:absolute;top:6px;right:6px}
+.item{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.item>div{min-width:0;overflow-wrap:anywhere}
+.item .f{font-family:var(--f-card);font-size:1.1rem}
+.item .b{font-size:.9rem;color:var(--muted)}
+.item img{max-height:44px;max-width:100%;background:#fff;border-radius:4px}
+.ops{display:flex;gap:4px;align-items:center}
+.confirm{display:flex;gap:6px;align-items:center;font-size:.85rem;color:var(--bad);flex-wrap:wrap}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:700;padding:4px 0}
+.blist{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:6px 14px;padding:8px 0 4px;font-size:.92rem}
+.blist .f{font-family:var(--f-card);font-size:1.02rem;overflow-wrap:anywhere}
+.blist .b{color:var(--muted);overflow-wrap:anywhere}
+.sync{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sync-dot,#9aa7c2)}
+@media (max-width:480px){.item{grid-template-columns:1fr auto}.item .b{grid-column:1/2}.blist{grid-template-columns:1fr}.blist .b{padding-bottom:6px;border-bottom:1px dashed var(--line)}}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Karteikasten</h1>
+    <nav class="tabs" role="tablist">
+      <button id="tab_learn" role="tab" aria-selected="true">Lernen</button>
+      <button id="tab_cards" role="tab" aria-selected="false">Karten</button>
+      <button id="tab_account" role="tab" aria-selected="false">Konto</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+  <p class="sync" id="sync">Fortschritt wird auf diesem Gerät gespeichert.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="cards.js"></script>
+<script>
+/* ---------------- Karten aufbereiten ---------------- */
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
+const BUILTIN=[];
+DECKS.forEach(d=>d.themen.forEach(t=>t.cards.forEach(([f,b])=>BUILTIN.push({id:'b'+hash(d.fach+'|'+t.name+'|'+f),fach:d.fach,thema:t.name,front:{text:f,img:''},back:{text:b,img:''},builtin:true}))));
+
+/* ---------------- Speicher (pro Benutzer auf dem Gerät) ---------------- */
+const BASE='karteikasten-v2';
+let USER=null; // {id,email}
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+const keyFor=()=>BASE+':'+(USER?USER.id:'gast');
+function parse(raw){try{const s=JSON.parse(raw);return {own:s.own||[],stats:s.stats||{},epoch:s.epoch||0,dir:s.dir||'mix'}}catch(e){return null}}
+function load(){
+  const mine=parse(lsGet(keyFor()));if(mine)return mine;
+  if(USER){const guest=parse(lsGet(BASE+':gast'));if(guest)return guest}   // Gast-Fortschritt beim ersten Login übernehmen
+  return {own:[],stats:{},epoch:0,dir:'mix'};
+}
+let S=load();
+function save(){lsSet(keyFor(),JSON.stringify(S))}
+
+const own=()=>S.own.filter(c=>!c.deleted);
+const allCards=()=>BUILTIN.concat(own());
+function fachList(){const names=DECKS.map(d=>d.fach);own().forEach(c=>{if(!names.includes(c.fach))names.push(c.fach)});return names}
+function hueOf(f){const d=DECKS.find(x=>x.fach===f);return d?d.hue:'--c-own'}
+function themenOf(f){const d=DECKS.find(x=>x.fach===f),list=d?d.themen.map(t=>t.name):[];own().filter(c=>c.fach===f).forEach(c=>{if(!list.includes(c.thema))list.push(c.thema)});return list}
+function cardsOf(fach,thema){return allCards().filter(c=>(!fach||c.fach===fach)&&(!thema||c.thema===thema))}
+function progress(cards){let known=0,right=0;cards.forEach(c=>{const s=S.stats[c.id];if(s&&s.r>0){known++;right+=s.r}});return{known,total:cards.length,right,pct:cards.length?Math.round(100*known/cards.length):0}}
+
+/* ---------------- Supabase: Konten & Abgleich ---------------- */
+const CFG=window.KARTEI_CONFIG||{};
+const sb=(CFG.url&&CFG.anonKey&&window.supabase&&window.supabase.createClient)?window.supabase.createClient(CFG.url,CFG.anonKey):null;
+const SYNC={busy:Promise.resolve(),timer:null};
+let recovery=false;
+const online=()=>!!(sb&&USER);
+function syncLabel(t,c){const el=document.getElementById('sync');if(!el)return;el.textContent=t;el.style.setProperty('--sync-dot',c||'#9aa7c2')}
+function syncState(){
+  if(!sb)return syncLabel('Fortschritt wird auf diesem Gerät gespeichert.');
+  if(!USER)return syncLabel('Als Gast: Fortschritt nur auf diesem Gerät. Unter „Konto“ einloggen für alle Geräte.');
+  syncLabel('Eingeloggt als '+USER.email+'. Fortschritt gilt auf allen Geräten.','var(--ok)');
+}
+function mergeStats(r){
+  if(!r)return false;const re=Number(r.epoch)||0,rs=r.stats||{};
+  if(re>S.epoch){S.epoch=re;S.stats=JSON.parse(JSON.stringify(rs));return false}
+  if(re<S.epoch)return true;
+  let push=false;
+  for(const id in rs){const a=S.stats[id]||{r:0,w:0},b=rs[id];S.stats[id]={r:Math.max(a.r||0,b.r||0),w:Math.max(a.w||0,b.w||0)}}
+  for(const id in S.stats){const b=rs[id],a=S.stats[id];if(!b||b.r!==a.r||b.w!==a.w)push=true}
+  return push;
+}
+function queue(fn){
+  SYNC.busy=SYNC.busy.then(fn).then(syncState).catch(()=>syncLabel('Gerade offline. Alles ist auf diesem Gerät gespeichert und wird später abgeglichen.','#d9a400'));
+  return SYNC.busy;
+}
+async function upStats(){const {error}=await sb.from('progress').upsert({user_id:USER.id,epoch:S.epoch,stats:S.stats,updated_at:new Date().toISOString()});if(error)throw error}
+async function upCard(c){const {error}=await sb.from('own_cards').upsert({user_id:USER.id,id:c.id,fach:c.fach,thema:c.thema,front:c.front,back:c.back,updated:c.updated||0,deleted:!!c.deleted},{onConflict:'user_id,id'});if(error)throw error}
+function pushStats(){if(!online())return;clearTimeout(SYNC.timer);SYNC.timer=setTimeout(()=>queue(upStats),1500)}
+function pushCard(c){if(!online())return;const copy=JSON.parse(JSON.stringify(c));queue(()=>upCard(copy))}
+function pullAll(){
+  if(!online())return;
+  return queue(async()=>{
+    const {data:p,error:e1}=await sb.from('progress').select('epoch,stats').eq('user_id',USER.id).maybeSingle();if(e1)throw e1;
+    const needPush=p?mergeStats(p):Object.keys(S.stats).length>0;
+    const {data:rows,error:e2}=await sb.from('own_cards').select('*').eq('user_id',USER.id);if(e2)throw e2;
+    const mine={};S.own.forEach(c=>mine[c.id]=c);
+    const remote={};(rows||[]).forEach(r=>remote[r.id]={id:r.id,fach:r.fach,thema:r.thema,front:r.front,back:r.back,updated:Number(r.updated)||0,deleted:!!r.deleted});
+    for(const id in remote){const l=mine[id];if(!l||remote[id].updated>(l.updated||0))mine[id]=remote[id]}
+    const upload=Object.values(mine).filter(l=>!remote[l.id]||(l.updated||0)>remote[l.id].updated);
+    S.own=Object.values(mine);save();
+    for(const c of upload)await upCard(c);
+    if(needPush)await upStats();
+    if(!session&&tab!=='account')render();
+  });
+}
+function setUser(u){
+  const next=u?{id:u.id,email:u.email}:null;
+  if((next&&next.id)===(USER&&USER.id))return;
+  USER=next;S=load();save();session=null;editing=null;render();syncState();
+  if(USER)pullAll();
+}
+async function initAuth(){
+  syncState();if(!sb)return;
+  try{const {data}=await sb.auth.getSession();setUser(data&&data.session?data.session.user:null)}catch(e){}
+  sb.auth.onAuthStateChange((event,ses)=>{
+    if(event==='PASSWORD_RECOVERY'){recovery=true;tab='account';render()}
+    setUser(ses?ses.user:null);
+  });
+}
+
+/* ---------------- Konto-Ansicht ---------------- */
+let accMsg='';
+function renderAccount(){
+  let h='';
+  if(!sb){
+    h=`<section class="panel"><h2>Konto</h2><p class="note">Die Konten sind noch nicht eingerichtet. Solange lernst du als Gast, und dein Fortschritt bleibt auf diesem Gerät.</p></section>`;
+  }else if(recovery){
+    h=`<form class="panel" id="newPw"><h2>Neues Passwort festlegen</h2>
+      <div class="field"><label class="lbl" for="pw1">Neues Passwort (mind. 8 Zeichen)</label><input type="password" id="pw1" autocomplete="new-password" minlength="8" required></div>
+      <p class="note" id="accMsg">${esc(accMsg)}</p><div class="row"><button class="btn primary" type="submit">Passwort speichern</button></div></form>`;
+  }else if(USER){
+    const p=progress(allCards());
+    h=`<section class="panel"><h2>Dein Konto</h2><p style="margin:0">Eingeloggt als <b>${esc(USER.email)}</b></p>
+      ${bar(p,'--accent')}${statLine(p)}
+      <p class="note">Dein Fortschritt und deine eigenen Karten werden mit deinem Konto gespeichert. Auf jedem Gerät, auf dem du dich einloggst, siehst du denselben Stand.</p>
+      <div class="row"><button class="btn" id="logout" type="button">Abmelden</button></div></section>`;
+  }else{
+    h=`<form class="panel" id="login" novalidate><h2>Einloggen oder registrieren</h2>
+      <p class="note">Mit Konto wird dein Fortschritt auf allen Geräten gespeichert. Ohne Konto kannst du trotzdem lernen, dann bleibt er nur auf diesem Gerät.</p>
+      <div class="field"><label class="lbl" for="em">E-Mail</label><input type="email" id="em" autocomplete="email" required></div>
+      <div class="field"><label class="lbl" for="pw">Passwort (mind. 8 Zeichen)</label><input type="password" id="pw" autocomplete="current-password" minlength="8" required></div>
+      <p class="note" id="accMsg" role="status">${esc(accMsg)}</p>
+      <div class="row"><button class="btn primary" type="submit">Einloggen</button><button class="btn" type="button" id="signup">Neues Konto erstellen</button><button class="btn ghost small" type="button" id="forgot">Passwort vergessen?</button></div></form>`;
+  }
+  view.innerHTML=h;
+  const msg=t=>{accMsg=t;const el=$('#accMsg');if(el)el.textContent=t};
+  const creds=()=>{const e=$('#em').value.trim(),p=$('#pw').value;if(!e||!e.includes('@')){msg('Bitte eine gültige E-Mail eingeben.');return null}return{email:e,password:p}};
+  const back=location.origin+location.pathname;
+  if($('#login'))$('#login').onsubmit=async e=>{e.preventDefault();const c=creds();if(!c)return;if(c.password.length<8)return msg('Das Passwort braucht mindestens 8 Zeichen.');
+    msg('Einen Moment …');const {error}=await sb.auth.signInWithPassword(c);
+    if(error)msg(/confirm/i.test(error.message)?'Bitte bestätige zuerst deine E-Mail. Schau in dein Postfach.':'Das hat nicht geklappt. E-Mail oder Passwort stimmen nicht.');else{accMsg='';tab='learn';render()}};
+  if($('#signup'))$('#signup').onclick=async()=>{const c=creds();if(!c)return;if(c.password.length<8)return msg('Das Passwort braucht mindestens 8 Zeichen.');
+    msg('Einen Moment …');const {data,error}=await sb.auth.signUp({...c,options:{emailRedirectTo:back}});
+    if(error)msg(/registered|exists/i.test(error.message)?'Für diese E-Mail gibt es schon ein Konto. Log dich einfach ein.':'Konto konnte nicht erstellt werden: '+error.message);
+    else if(data&&data.session){accMsg='';tab='learn';render()}
+    else msg('Fast fertig! Wir haben dir eine E-Mail geschickt. Klick auf den Link darin, dann kannst du dich einloggen.')};
+  if($('#forgot'))$('#forgot').onclick=async()=>{const e=$('#em').value.trim();if(!e.includes('@'))return msg('Gib oben deine E-Mail ein, dann tipp nochmal auf „Passwort vergessen?“.');
+    const {error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:back});msg(error?'Das hat nicht geklappt: '+error.message:'Wir haben dir eine E-Mail zum Zurücksetzen geschickt.')};
+  if($('#logout'))$('#logout').onclick=async()=>{await sb.auth.signOut();accMsg='';render()};
+  if($('#newPw'))$('#newPw').onsubmit=async e=>{e.preventDefault();const p=$('#pw1').value;if(p.length<8)return msg('Das Passwort braucht mindestens 8 Zeichen.');
+    const {error}=await sb.auth.updateUser({password:p});if(error)msg('Das hat nicht geklappt: '+error.message);else{recovery=false;accMsg='';tab='learn';render()}};
+}
+
+/* ---------------- Ansicht ---------------- */
+
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=s=>document.querySelector(s);
+const view=$('#view');
+let tab='learn',session=null,editing=null,pendingDelete=null,confirmReset=false;
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function bar(p,hue,thin){return `<div class="bar${thin?' thin':''}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p.pct}" style="--hue:var(${hue})"><i style="width:${p.pct}%"></i></div>`}
+function statLine(p){return `<div class="stat"><span>Gewusst: <b>${p.known}</b> von ${p.total} Karten</span><span>${p.right}× richtig</span></div>`}
+
+function startSession(cards,label){
+  if(!cards.length)return;
+  session={label,queue:shuffle(cards.map(c=>({id:c.id,rev:S.dir==='back'?true:S.dir==='front'?false:Math.random()<.5}))),i:0,flipped:false,right:[],wrong:[]};
+  window.scrollTo({top:0});render();
+}
+
+function renderHome(){
+  const all=allCards(),pa=progress(all),fl=fachList();
+  let legend='',seg='';
+  fl.forEach(f=>{const c=cardsOf(f),p=progress(c);legend+=`<span style="--hue:var(${hueOf(f)})">${esc(f)}</span>`;if(all.length)seg+=`<i style="width:${100*p.known/all.length}%;background:var(${hueOf(f)})"></i>`});
+  let h=`<div class="row"><div class="field"><label class="lbl" for="selDir">Was kommt zuerst?</label>
+    <select id="selDir"><option value="mix"${S.dir==='mix'?' selected':''}>Gemischt</option><option value="front"${S.dir==='front'?' selected':''}>Begriff / Zeichen</option><option value="back"${S.dir==='back'?' selected':''}>Erklärung</option></select></div></div>
+  <section class="panel mix"><div class="fach-head"><h2>Alles gemischt</h2><button class="btn primary" data-start="__all">Lernen · ${all.length}</button></div>
+    <div class="mix-bars" role="progressbar" aria-valuenow="${pa.pct}" aria-valuemin="0" aria-valuemax="100">${seg}</div>${statLine(pa)}<div class="legend">${legend}</div></section>`;
+  fl.forEach((f,fi)=>{
+    const c=cardsOf(f),p=progress(c),hue=hueOf(f);
+    h+=`<section class="panel fach" style="--hue:var(${hue})"><div class="fach-head"><h2>${esc(f)}</h2><button class="btn primary" data-start="f${fi}">Ganzes Fach · ${c.length}</button></div>${bar(p,hue)}${statLine(p)}<div class="themen">`;
+    themenOf(f).forEach((t,ti)=>{const tc=cardsOf(f,t),tp=progress(tc);
+      h+=`<button class="thema" data-start="f${fi}t${ti}"><span class="name">${esc(t)}</span><span class="cnt">${tp.known}/${tc.length} ▸</span>${bar(tp,hue,true)}</button>`});
+    h+=`</div></section>`;
+  });
+  h+=`<p class="note">Jede Karte kommt pro Runde genau einmal dran. Der Balken zeigt nur, welche Karten du schon mindestens einmal gewusst hast. An der Reihenfolge ändert er nichts.</p>`;
+  view.innerHTML=h;
+  $('#selDir').onchange=e=>{S.dir=e.target.value;save()};
+  view.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.start;if(k==='__all')return startSession(allCards(),'Alles gemischt');
+    const m=k.match(/^f(\d+)(?:t(\d+))?$/),f=fachList()[+m[1]];
+    if(m[2]===undefined)return startSession(cardsOf(f),f);
+    const t=themenOf(f)[+m[2]];startSession(cardsOf(f,t),f+' · '+t);
+  });
+}
+
+function face(side){const t=side.text||'',big=t.length&&t.length<=5&&!side.img;return `${side.img?`<img src="${side.img}" alt="Handschrift">`:''}${t?`<div class="txt${big?' big':''}">${esc(t)}</div>`:''}`}
+
+function renderSession(){
+  const s=session;let h=`<div class="stage">`;
+  if(s.i>=s.queue.length){
+    const r=s.right.length,w=s.wrong.length;
+    h+=`<section class="panel score"><span class="lbl">${esc(s.label)}</span><div class="num">${r} / ${r+w}</div><p class="note" style="color:inherit">${w?`${w} ${w===1?'Karte':'Karten'} nicht gewusst.`:'Alles gewusst! 🎉'}</p>
+      <div class="actions"><button class="btn primary" id="again">Nochmal alle</button>${w?'<button class="btn bad" id="wrongOnly">Nur die falschen</button>':''}<button class="btn" id="home">Zur Übersicht</button></div></section></div>`;
+    view.innerHTML=h;
+    const ids=s.queue.map(q=>q.id),wrong=s.wrong.slice(),label=s.label;
+    $('#again').onclick=()=>startSession(allCards().filter(c=>ids.includes(c.id)),label);
+    if(w)$('#wrongOnly').onclick=()=>startSession(allCards().filter(c=>wrong.includes(c.id)),label+' · falsche');
+    $('#home').onclick=()=>{session=null;render()};
+    return;
+  }
+  const q=s.queue[s.i],c=allCards().find(x=>x.id===q.id);
+  if(!c){s.i++;return render()}
+  const shown=s.flipped?(q.rev?c.front:c.back):(q.rev?c.back:c.front);
+  const isFront=(s.flipped?q.rev:!q.rev);
+  h+=`<div class="meta"><span class="chip">${esc(s.label)}</span><span>Karte ${s.i+1} von ${s.queue.length} · ✓ ${s.right.length} ✗ ${s.wrong.length}</span></div>
+   <div class="icard${s.flipped?' back':''}" id="card" role="button" tabindex="0" aria-label="Karte umdrehen"><span class="side">${isFront?'Begriff / Zeichen':'Erklärung'}</span><span class="where">${esc(c.thema)}</span><div class="content">${face(shown)}</div></div>`;
+  h+=s.flipped?`<div class="answer"><button class="btn bad" id="no">✗ Nicht gewusst</button><button class="btn ok" id="yes">✓ Gewusst</button></div>`:`<p class="hint">Überleg dir die Antwort, dann tipp auf die Karte.</p>`;
+  h+=`<button class="btn ghost small" id="stop">Runde beenden</button></div>`;
+  view.innerHTML=h;
+  const flip=()=>{s.flipped=!s.flipped;render()};
+  $('#card').onclick=flip;$('#card').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
+  if(s.flipped){
+    const answer=ok=>{const st=S.stats[c.id]||{r:0,w:0};ok?st.r++:st.w++;S.stats[c.id]=st;(ok?s.right:s.wrong).push(c.id);save();pushStats();s.i++;s.flipped=false;render()};
+    $('#yes').onclick=()=>answer(true);$('#no').onclick=()=>answer(false);
+  }
+  $('#stop').onclick=()=>{session=null;render()};
+}
+
+/* ---------------- Handschrift ---------------- */
+function makePad(canvas,initial){
+  const ctx=canvas.getContext('2d');let drawing=false,dirty=!!initial,last=null,sized=false;
+  function size(){const r=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;if(!r.width)return;
+    const keep=sized&&dirty?canvas.toDataURL():initial;sized=true;
+    canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,r.width,r.height);ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#14203b';
+    if(keep){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,r.width,r.height);im.src=keep}}
+  requestAnimationFrame(size);
+  const pos=e=>{const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  canvas.addEventListener('pointerdown',e=>{drawing=true;dirty=true;last=pos(e);canvas.setPointerCapture(e.pointerId);ctx.beginPath();ctx.arc(last.x,last.y,1.2,0,7);ctx.fillStyle='#14203b';ctx.fill()});
+  canvas.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);ctx.lineWidth=e.pointerType==='pen'&&e.pressure?1.5+e.pressure*3:2.6;ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p});
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>canvas.addEventListener(t,()=>drawing=false));
+  return{size(){if(!sized)size()},clear(){dirty=false;initial='';const r=canvas.getBoundingClientRect();ctx.fillStyle='#fff';ctx.fillRect(0,0,r.width,r.height)},
+    value(){if(!dirty)return'';const r=canvas.getBoundingClientRect(),o=document.createElement('canvas');o.width=Math.round(r.width);o.height=Math.round(r.height);o.getContext('2d').drawImage(canvas,0,0,o.width,o.height);return o.toDataURL('image/png')}};
+}
+
+/* ---------------- Karten-Verwaltung ---------------- */
+function sideEditor(key,title,side){
+  const mode=side.img?'pen':'text';
+  return `<div class="field" data-side="${key}"><div class="sidehead"><label class="lbl" for="t_${key}">${title}</label>
+    <div class="modes"><button type="button" data-m="text" aria-pressed="${mode==='text'}">Tippen</button><button type="button" data-m="pen" aria-pressed="${mode==='pen'}">✍️ Schreiben</button></div></div>
+    <input type="text" id="t_${key}" value="${esc(side.text)}" placeholder="${key==='front'?'z. B. ∀':'z. B. „für alle“'}"${mode==='pen'?' hidden':''}>
+    <div class="pad"${mode==='text'?' hidden':''}><canvas id="c_${key}"></canvas><button type="button" class="btn small clear">Löschen</button></div></div>`;
+}
+function renderCards(){
+  const fl=fachList(),c=editing||{fach:fl[1]||fl[0],thema:'Eigene Karten',front:{text:'',img:''},back:{text:'',img:''}};
+  const allThemen=[...new Set(fl.flatMap(themenOf).concat('Eigene Karten'))];
+  let h=`<form class="panel" id="form"><h2>${editing?'Karte ändern':'Eigene Karte anlegen'}</h2>
+    <div class="row"><div class="field"><label class="lbl" for="fFach">Fach (neues einfach eintippen)</label><input type="text" id="fFach" list="fachList" value="${esc(c.fach)}"></div>
+    <div class="field"><label class="lbl" for="fThema">Thema</label><input type="text" id="fThema" list="themaList" value="${esc(c.thema)}"></div></div>
+    <datalist id="fachList">${fl.map(f=>`<option value="${esc(f)}">`).join('')}</datalist><datalist id="themaList">${allThemen.map(t=>`<option value="${esc(t)}">`).join('')}</datalist>
+    ${sideEditor('front','Vorderseite: Begriff / Zeichen',c.front)}${sideEditor('back','Rückseite: Erklärung',c.back)}
+    <p class="note" id="formMsg" hidden></p>
+    <div class="row"><button class="btn primary" type="submit">${editing?'Änderung speichern':'Karte hinzufügen'}</button>${editing?'<button class="btn" type="button" id="cancel">Abbrechen</button>':''}</div></form>`;
+  const mine=own();
+  h+=`<section class="panel"><h2>Deine eigenen Karten · ${mine.length}</h2>`;
+  if(!mine.length)h+=`<p class="note">Noch keine eigenen Karten. Oben kannst du welche anlegen, getippt oder mit dem Stift.</p>`;
+  mine.forEach(x=>{const del=pendingDelete===x.id;
+    h+=`<div class="item"><div class="f">${x.front.img?`<img src="${x.front.img}" alt="">`:''}${esc(x.front.text)}</div><div class="b">${x.back.img?`<img src="${x.back.img}" alt="">`:''}${esc(x.back.text)}<br><span class="note">${esc(x.fach)} · ${esc(x.thema)}</span></div>
+      <div class="ops">${del?`<span class="confirm">Löschen? <button type="button" class="btn small bad" data-yes="${x.id}">Ja</button><button type="button" class="btn small" data-no="1">Nein</button></span>`:`<button type="button" class="btn small" data-edit="${x.id}">Ändern</button><button type="button" class="btn small ghost" data-del="${x.id}" aria-label="Löschen">✕</button>`}</div></div>`});
+  h+=`</section><section class="panel"><h2>Eingebaute Karten · ${BUILTIN.length}</h2><p class="note">Aus deinen Vorlesungen. Zum Nachschlagen aufklappen.</p>`;
+  DECKS.forEach(d=>{h+=`<details><summary>${esc(d.fach)}</summary>`;d.themen.forEach(t=>{h+=`<h3 style="margin-top:8px">${esc(t.name)}</h3><div class="blist">${t.cards.map(([f,b])=>`<div class="f">${esc(f)}</div><div class="b">${esc(b)}</div>`).join('')}</div>`});h+=`</details>`});
+  h+=`</section><section class="panel"><h2>Sicherung & Fortschritt</h2>
+    <p class="note">Kopiert deine eigenen Karten und deinen Fortschritt als Text, z. B. für eine Notiz.</p>
+    <div class="row"><button type="button" class="btn small" id="exp">Sicherung kopieren</button><button type="button" class="btn small" id="impShow">Sicherung einfügen</button></div>
+    <textarea id="bak" rows="4" hidden></textarea><p class="note" id="bakMsg" hidden></p><button type="button" class="btn small primary" id="impDo" hidden>Sicherung laden</button>
+    <div class="row">${confirmReset?`<span class="confirm">Wirklich den ganzen Fortschritt auf 0 setzen? <button type="button" class="btn small bad" id="resetYes">Ja, zurücksetzen</button><button type="button" class="btn small" id="resetNo">Nein</button></span>`:`<button type="button" class="btn small ghost" id="reset">Fortschritt zurücksetzen</button>`}</div></section>`;
+  view.innerHTML=h;
+
+  const pads={};
+  ['front','back'].forEach(k=>{
+    const box=document.querySelector(`[data-side="${k}"]`),inp=box.querySelector('input'),pad=box.querySelector('.pad');
+    pads[k]={mode:c[k].img?'pen':'text',p:makePad(box.querySelector('canvas'),c[k].img)};
+    pad.querySelector('.clear').onclick=()=>pads[k].p.clear();
+    box.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{pads[k].mode=b.dataset.m;box.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',x===b));inp.hidden=b.dataset.m!=='text';pad.hidden=b.dataset.m!=='pen';if(b.dataset.m==='pen')requestAnimationFrame(()=>pads[k].p.size())});
+  });
+  $('#form').onsubmit=e=>{e.preventDefault();
+    const fach=$('#fFach').value.trim()||'Eigene Karten',thema=$('#fThema').value.trim()||'Eigene Karten';
+    const side=k=>pads[k].mode==='pen'?{text:'',img:pads[k].p.value()}:{text:$('#t_'+k).value.trim(),img:''};
+    const f=side('front'),b=side('back'),msg=$('#formMsg');
+    if(!(f.text||f.img)||!(b.text||b.img)){msg.hidden=false;msg.textContent='Bitte beide Seiten ausfüllen, getippt oder geschrieben.';return}
+    let card;
+    if(editing){card=S.own.find(x=>x.id===editing.id);Object.assign(card,{fach,thema,front:f,back:b,updated:Date.now()})}
+    else{card={id:uid(),fach,thema,front:f,back:b,updated:Date.now()};S.own.push(card)}
+    editing=null;save();pushCard(card);render();
+  };
+  if($('#cancel'))$('#cancel').onclick=()=>{editing=null;render()};
+  view.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{editing=JSON.parse(JSON.stringify(S.own.find(x=>x.id===b.dataset.edit)));render();window.scrollTo({top:0})});
+  view.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{pendingDelete=b.dataset.del;render()});
+  view.querySelectorAll('[data-no]').forEach(b=>b.onclick=()=>{pendingDelete=null;render()});
+  view.querySelectorAll('[data-yes]').forEach(b=>b.onclick=()=>{const card=S.own.find(x=>x.id===b.dataset.yes);Object.assign(card,{deleted:true,front:{text:'',img:''},back:{text:'',img:''},updated:Date.now()});pendingDelete=null;save();pushCard(card);render()});
+  const bak=$('#bak'),bm=$('#bakMsg');
+  $('#exp').onclick=()=>{const t=JSON.stringify({own:own(),stats:S.stats,epoch:S.epoch});bak.hidden=false;bak.value=t;$('#impDo').hidden=true;
+    const done=()=>{bm.hidden=false;bm.textContent='Kopiert. Füg es in eine Notiz ein.'};
+    try{navigator.clipboard.writeText(t).then(done,()=>{bak.select();bm.hidden=false;bm.textContent='Text ist markiert. Jetzt selbst kopieren.'})}catch(e){bak.select()}};
+  $('#impShow').onclick=()=>{bak.hidden=false;bak.value='';bak.placeholder='Sicherung hier einfügen';$('#impDo').hidden=false;bm.hidden=true;bak.focus()};
+  $('#impDo').onclick=()=>{try{const d=JSON.parse(bak.value);
+      const cards=Array.isArray(d)?d:(d.own||[]);
+      cards.filter(x=>x&&x.front&&x.back).forEach(x=>{const n={id:x.id||uid(),fach:x.fach||x.subject||'Eigene Karten',thema:x.thema||'Eigene Karten',front:x.front,back:x.back,updated:Date.now()};const i=S.own.findIndex(y=>y.id===n.id);if(i>=0)S.own[i]=n;else S.own.push(n);pushCard(n)});
+      if(d.stats)mergeStats({epoch:d.epoch||0,stats:d.stats});
+      save();pushStats();bm.hidden=false;bm.textContent='Sicherung geladen.';render()}
+    catch(e){bm.hidden=false;bm.textContent='Das sieht nicht wie eine Sicherung aus. Bitte den kompletten kopierten Text einfügen.'}};
+  if($('#reset'))$('#reset').onclick=()=>{confirmReset=true;render()};
+  if($('#resetNo'))$('#resetNo').onclick=()=>{confirmReset=false;render()};
+  if($('#resetYes'))$('#resetYes').onclick=()=>{S.stats={};S.epoch=Date.now();confirmReset=false;save();pushStats();render()};
+}
+
+
+
+function render(){
+  ['learn','cards','account'].forEach(t=>document.getElementById('tab_'+t).setAttribute('aria-selected',tab===t));
+  if(tab==='cards')return renderCards();
+  if(tab==='account')return renderAccount();
+  session?renderSession():renderHome();
+}
+document.getElementById('tab_learn').onclick=()=>{tab='learn';render()};
+document.getElementById('tab_cards').onclick=()=>{tab='cards';pendingDelete=null;confirmReset=false;render()};
+document.getElementById('tab_account').onclick=()=>{tab='account';render()};
+render();
+initAuth();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+</script>
+</body>
+</html>
