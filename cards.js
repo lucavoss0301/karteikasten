@@ -4,6 +4,27 @@ const sup=n=>String(n).split('').map(d=>SUP[d]).join('');
 const POT=[];for(let i=0;i<=16;i++)POT.push(['2'+sup(i),String(2**i)]);
 
 const DECKS=[
+{fach:'Zeichen',hue:'--c-zeichen',themen:[
+ {name:'Mengen',cards:[
+  ['∈','Element von'],['∉','kein Element von'],['{ }','Mengenklammer: alles darin gehört zur Menge'],['; (in einer Menge)','trennt die Elemente'],
+  ['∅','leere Menge'],['|A|','Anzahl der Elemente von A'],[':=','wird definiert als'],['≠','ungleich'],
+  ['∩','Schnitt („geschnitten“): in beiden'],['∪','Vereinigung („vereinigt“): in mindestens einer'],['\\','ohne (Differenz)'],['Δ (bei Mengen)','symmetrische Differenz: in genau einer'],
+  ['⊂ (bei Prof. Lipskoch)','Teilmenge (gleich erlaubt)'],['⊆','Teilmenge (gleich erlaubt)'],['⊊','echte Teilmenge'],['⊃','Obermenge'],
+  ['B̄ (Strich drüber)','Komplement: alles außer B'],[': (in { … : … })','für die gilt']]},
+ {name:'Logik',cards:[
+  ['¬','nicht'],['∧','und'],['∨','oder (auch beide)'],['⊕','entweder … oder (nur eins)'],
+  ['⇒','daraus folgt / wenn … dann'],['⇔','genau dann, wenn'],['∀','für alle'],['∃','es gibt (mindestens ein)'],['W / 1','wahr'],['F / 0','falsch']]},
+ {name:'Zahlen',cards:[
+  ['<','kleiner als'],['>','größer als'],['≤','kleiner oder gleich'],['≥','größer oder gleich'],
+  ['Σ','Summe: alles zusammenzählen'],['∞','unendlich'],['mod','Rest beim Teilen'],['2ⁿ','2 hoch n: n-mal verdoppeln']]},
+ {name:'Graphen',cards:[
+  ['V','Knotenmenge'],['E','Kantenmenge'],['V²','alle möglichen Kanten'],['p','Anzahl der Knoten'],['q','Anzahl der Kanten'],
+  ['{u, v}','Kante zwischen u und v'],['grad v','Grad von v: Anzahl Nachbarn'],['Δ(G)','größter Grad'],['δ(G)','kleinster Grad'],
+  ['G′ („G Strich“)','Teilgraph von G'],['d(u, v)','Abstand von u und v'],['d(G)','Durchmesser'],['≅','isomorph'],['φ („phi“)','Isomorphismus (die Umbenennung)']]},
+ {name:'Java',cards:[
+  ['!','nicht'],['&&','und'],['||','oder'],['= (in Java)','Zuweisung: „leg rein“'],['; (in Java)','Ende einer Anweisung'],
+  ['{ } (in Java)','Block: gehört zusammen'],['//','Kommentar, wird nicht ausgeführt'],['<=','kleiner oder gleich']]}
+]},
 {fach:'Programmierung I',hue:'--c-prog',themen:[
  {name:'Grundlagen & Java',cards:[
   ['Algorithmus','Eindeutige Schritt-für-Schritt-Anleitung, die ein Problem in endlich vielen Schritten löst'],
