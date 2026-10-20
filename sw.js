@@ -1,8 +1,8 @@
 /* Offline-Unterstützung: Die Seite wird beim ersten Besuch gespeichert.
    Eigene Dateien: erst Internet (damit Updates sofort da sind), sonst Speicher.
    Schriften und Bibliothek: erst Speicher, sonst Internet. */
-const CACHE = 'karteikasten-v2';
-const SHELL = ['./', './index.html', './cards.js', './config.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const CACHE = 'karteikasten-v3';
+const SHELL = ['./', './index.html', './cards.js', './aufgaben.js', './config.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

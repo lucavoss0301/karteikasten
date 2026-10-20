@@ -135,6 +135,22 @@ summary{cursor:pointer;font-weight:700;padding:4px 0}
 .sync{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px}
 .sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sync-dot,#9aa7c2)}
 @media (max-width:480px){.item{grid-template-columns:1fr auto}.item .b{grid-column:1/2}.blist{grid-template-columns:1fr}.blist .b{padding-bottom:6px;border-bottom:1px dashed var(--line)}}
+/* Übungen */
+.task .q{font-size:1.08rem;white-space:pre-wrap;margin:0;overflow-wrap:anywhere}
+.task pre{margin:0;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font:.92rem/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--card-ink)}
+.graphs{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.graphs svg{flex:1 1 220px;max-width:420px;height:auto}
+.graphs line{stroke:var(--card-ink);stroke-width:2.2}
+.graphs circle{fill:var(--card);stroke:var(--hue,var(--accent));stroke-width:2.5}
+.graphs text{fill:var(--card-ink);font:700 15px var(--f-body);text-anchor:middle;dominant-baseline:central}
+#view{display:flex;flex-direction:column;gap:14px}
+.pad.big canvas{height:300px}
+textarea.ans{min-height:140px;resize:vertical;font-size:1.05rem}
+.sol{border-left:6px solid var(--ok)}
+.sol .res{font-family:var(--f-card);font-size:1.25rem;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.sol ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
+.sol li::marker{font-weight:700;color:var(--ok)}
+@media (max-width:440px){.tabs button{padding:8px 11px;font-size:.9rem}}
 @media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
 </style>
 </head>
@@ -144,6 +160,7 @@ summary{cursor:pointer;font-weight:700;padding:4px 0}
     <h1>Karteikasten</h1>
     <nav class="tabs" role="tablist">
       <button id="tab_learn" role="tab" aria-selected="true">Lernen</button>
+      <button id="tab_ueben" role="tab" aria-selected="false">Üben</button>
       <button id="tab_cards" role="tab" aria-selected="false">Karten</button>
       <button id="tab_account" role="tab" aria-selected="false">Konto</button>
     </nav>
@@ -154,6 +171,7 @@ summary{cursor:pointer;font-weight:700;padding:4px 0}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script src="cards.js"></script>
+<script src="aufgaben.js"></script>
 <script>
 /* ---------------- Karten aufbereiten ---------------- */
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
@@ -167,11 +185,11 @@ const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
 function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 const keyFor=()=>BASE+':'+(USER?USER.id:'gast');
-function parse(raw){try{const s=JSON.parse(raw);return {own:s.own||[],stats:s.stats||{},epoch:s.epoch||0,dir:s.dir||'mix'}}catch(e){return null}}
+function parse(raw){try{const s=JSON.parse(raw);return {own:s.own||[],stats:s.stats||{},epoch:s.epoch||0,dir:s.dir||'mix',umode:s.umode||'text'}}catch(e){return null}}
 function load(){
   const mine=parse(lsGet(keyFor()));if(mine)return mine;
   if(USER){const guest=parse(lsGet(BASE+':gast'));if(guest)return guest}   // Gast-Fortschritt beim ersten Login übernehmen
-  return {own:[],stats:{},epoch:0,dir:'mix'};
+  return {own:[],stats:{},epoch:0,dir:'mix',umode:'text'};
 }
 let S=load();
 function save(){lsSet(keyFor(),JSON.stringify(S))}
@@ -226,13 +244,13 @@ function pullAll(){
     S.own=Object.values(mine);save();
     for(const c of upload)await upCard(c);
     if(needPush)await upStats();
-    if(!session&&tab!=='account')render();
+    if(!session&&!practice&&tab!=='account')render();
   });
 }
 function setUser(u){
   const next=u?{id:u.id,email:u.email}:null;
   if((next&&next.id)===(USER&&USER.id))return;
-  USER=next;S=load();save();session=null;editing=null;render();syncState();
+  USER=next;S=load();save();session=null;practice=null;editing=null;render();syncState();
   if(USER)pullAll();
 }
 async function initAuth(){
@@ -292,7 +310,7 @@ function renderAccount(){
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const $=s=>document.querySelector(s);
 const view=$('#view');
-let tab='learn',session=null,editing=null,pendingDelete=null,confirmReset=false;
+let tab='learn',session=null,practice=null,editing=null,pendingDelete=null,confirmReset=false;
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function bar(p,hue,thin){return `<div class="bar${thin?' thin':''}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p.pct}" style="--hue:var(${hue})"><i style="width:${p.pct}%"></i></div>`}
@@ -451,15 +469,91 @@ function renderCards(){
   if($('#resetYes'))$('#resetYes').onclick=()=>{S.stats={};S.epoch=Date.now();confirmReset=false;save();pushStats();render()};
 }
 
-
+/* ---------------- Übungen ---------------- */
+const UEB=[];
+UEBUNGEN.forEach(d=>d.themen.forEach(t=>t.aufgaben.forEach(x=>UEB.push(Object.assign({id:'u'+hash(d.fach+'|'+t.name+'|'+x.q+'|'+(x.code||'')),fach:d.fach,thema:t.name,hue:d.hue},x)))));
+function uProgress(list){let known=0,right=0;list.forEach(c=>{const s=S.stats[c.id];if(s&&s.r>0){known++;right+=s.r}});return{known,total:list.length,right,pct:list.length?Math.round(100*known/list.length):0}}
+function uStat(p){return `<div class="stat"><span>Geschafft: <b>${p.known}</b> von ${p.total} Aufgaben</span><span>${p.right}× richtig</span></div>`}
+function graphSvg(key){
+  const G=GRAPHS[key];if(!G)return'';const pts=Object.values(G.n),xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  const x0=Math.min(...xs)-24,y0=Math.min(...ys)-24,w=Math.max(...xs)-x0+24,h=Math.max(...ys)-y0+24;
+  const lines=G.e.split(' ').map(k=>{const [u,v]=k.split('-'),a=G.n[u],b=G.n[v];return `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`}).join('');
+  const nodes=Object.entries(G.n).map(([k,p])=>`<circle cx="${p[0]}" cy="${p[1]}" r="15"/><text x="${p[0]}" y="${p[1]}">${esc(k)}</text>`).join('');
+  return `<svg viewBox="${x0} ${y0} ${w} ${h}" role="img" aria-label="Graph mit den Kanten ${esc(G.e.replace(/-/g,'–').split(' ').join(', '))}">${lines}${nodes}</svg>`;
+}
+function startPractice(list,label,mix){
+  if(!list.length)return;
+  practice={label,queue:(mix?shuffle(list.slice()):list).map(x=>x.id),i:0,shown:false,right:[],wrong:[]};
+  window.scrollTo({top:0});render();
+}
+function renderUebenHome(){
+  const pa=uProgress(UEB);
+  let h=`<section class="panel mix"><div class="fach-head"><h2>Alle Aufgaben gemischt</h2><button class="btn primary" data-ustart="__all">Üben · ${UEB.length}</button></div>${bar(pa,'--accent')}${uStat(pa)}
+    <p class="note">So geht's: Aufgabe lesen → Lösung ins Feld tippen oder mit dem Stift schreiben → „Lösung vergleichen“. Dann siehst du die Lösung und den Weg dorthin Schritt für Schritt.</p></section>`;
+  UEBUNGEN.forEach((d,fi)=>{
+    const fl=UEB.filter(x=>x.fach===d.fach),p=uProgress(fl);
+    h+=`<section class="panel fach" style="--hue:var(${d.hue})"><div class="fach-head"><h2>${esc(d.fach)}</h2><button class="btn primary" data-ustart="f${fi}">Ganzes Fach · ${fl.length}</button></div>${bar(p,d.hue)}${uStat(p)}<div class="themen">`;
+    d.themen.forEach((t,ti)=>{const tl=fl.filter(x=>x.thema===t.name),tp=uProgress(tl);
+      h+=`<button class="thema" data-ustart="f${fi}t${ti}"><span class="name">${esc(t.name)}</span><span class="cnt">${tp.known}/${tl.length} ▸</span>${bar(tp,d.hue,true)}</button>`});
+    h+=`</div></section>`;
+  });
+  h+=`<p class="note">In einem Thema kommen die Aufgaben der Reihe nach, von leicht zu schwer. „Ganzes Fach“ und „Alle“ mischen.</p>`;
+  view.innerHTML=h;
+  view.querySelectorAll('[data-ustart]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.ustart;if(k==='__all')return startPractice(UEB,'Alle Aufgaben',true);
+    const m=k.match(/^f(\d+)(?:t(\d+))?$/),d=UEBUNGEN[+m[1]];
+    if(m[2]===undefined)return startPractice(UEB.filter(x=>x.fach===d.fach),d.fach,true);
+    const t=d.themen[+m[2]].name;startPractice(UEB.filter(x=>x.fach===d.fach&&x.thema===t),d.fach+' · '+t,false);
+  });
+}
+function renderUebung(){
+  const s=practice;
+  if(s.i>=s.queue.length){
+    const r=s.right.length,w=s.wrong.length;
+    view.innerHTML=`<div class="stage"><section class="panel score"><span class="lbl">${esc(s.label)}</span><div class="num">${r} / ${r+w}</div><p class="note" style="color:inherit">${w?`${w} ${w===1?'Aufgabe':'Aufgaben'} noch nicht richtig.`:(r?'Alles richtig! 🎉':'Fertig.')}</p>
+      <div class="actions"><button class="btn primary" id="again">Nochmal alle</button>${w?'<button class="btn bad" id="wrongOnly">Nur die falschen</button>':''}<button class="btn" id="home">Zur Übersicht</button></div></section></div>`;
+    const ids=s.queue.slice(),wrong=s.wrong.slice(),label=s.label;
+    $('#again').onclick=()=>startPractice(ids.map(id=>UEB.find(x=>x.id===id)).filter(Boolean),label,false);
+    if(w)$('#wrongOnly').onclick=()=>startPractice(wrong.map(id=>UEB.find(x=>x.id===id)).filter(Boolean),label+' · falsche',false);
+    $('#home').onclick=()=>{practice=null;render()};
+    return;
+  }
+  const x=UEB.find(u=>u.id===s.queue[s.i]);if(!x){s.i++;return render()}
+  const gs=x.g?(Array.isArray(x.g)?x.g:[x.g]):[],mode=S.umode==='pen'?'pen':'text';
+  let h=`<div class="stage" style="--hue:var(${x.hue})"><div class="meta"><span class="chip">${esc(s.label)}</span><span>Aufgabe ${s.i+1} von ${s.queue.length} · ✓ ${s.right.length} ✗ ${s.wrong.length}</span></div>
+    <section class="panel task fach"><span class="lbl">${esc(x.fach)} · ${esc(x.thema)}</span>
+      ${gs.length?`<div class="graphs">${gs.map(graphSvg).join('')}</div>`:''}
+      ${x.code?`<pre><code>${esc(x.code)}</code></pre>`:''}
+      <p class="q">${esc(x.q)}</p></section>
+    <section class="panel"><div class="sidehead"><span class="lbl">Deine Lösung</span>
+      <div class="modes"><button type="button" data-m="text" aria-pressed="${mode==='text'}">Tippen</button><button type="button" data-m="pen" aria-pressed="${mode==='pen'}">✍️ Schreiben</button></div></div>
+      <textarea class="ans" id="ans" aria-label="Deine Lösung" placeholder="Schreib hier deine Lösung …"${mode==='pen'?' hidden':''}></textarea>
+      <div class="pad big"${mode==='text'?' hidden':''}><canvas id="upad" aria-label="Schreibfeld für den Stift"></canvas><button type="button" class="btn small clear">Löschen</button></div></section>
+    <button class="btn primary" id="reveal">Lösung vergleichen</button>
+    <section class="panel sol" id="sol" hidden><span class="lbl">Lösung</span><p class="res">${esc(x.a)}</p>
+      <span class="lbl">So kommst du drauf</span><ol>${x.weg.map(w=>`<li>${esc(w)}</li>`).join('')}</ol></section>
+    <div id="rate" hidden><p class="hint" style="margin-bottom:10px">Vergleich mit deiner Lösung. Hattest du es richtig?</p>
+      <div class="answer"><button class="btn bad" id="no">✗ Noch nicht</button><button class="btn ok" id="yes">✓ Richtig</button></div></div>
+    <button class="btn ghost small" id="stop">Runde beenden</button></div>`;
+  view.innerHTML=h;
+  const pad=makePad($('#upad'),''),padBox=view.querySelector('.pad'),ta=$('#ans');
+  padBox.querySelector('.clear').onclick=()=>pad.clear();
+  view.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{S.umode=b.dataset.m;save();view.querySelectorAll('.modes button').forEach(y=>y.setAttribute('aria-pressed',y===b));ta.hidden=b.dataset.m!=='text';padBox.hidden=b.dataset.m!=='pen';if(b.dataset.m==='pen')requestAnimationFrame(()=>pad.size())});
+  $('#reveal').onclick=()=>{$('#sol').hidden=false;$('#rate').hidden=false;$('#reveal').hidden=true;$('#sol').scrollIntoView({behavior:'smooth',block:'start'})};
+  const answer=ok=>{const st=S.stats[x.id]||{r:0,w:0};ok?st.r++:st.w++;S.stats[x.id]=st;(ok?s.right:s.wrong).push(x.id);save();pushStats();s.i++;window.scrollTo({top:0});render()};
+  $('#yes').onclick=()=>answer(true);$('#no').onclick=()=>answer(false);
+  $('#stop').onclick=()=>{practice=null;render()};
+}
 
 function render(){
-  ['learn','cards','account'].forEach(t=>document.getElementById('tab_'+t).setAttribute('aria-selected',tab===t));
+  ['learn','ueben','cards','account'].forEach(t=>document.getElementById('tab_'+t).setAttribute('aria-selected',tab===t));
   if(tab==='cards')return renderCards();
   if(tab==='account')return renderAccount();
+  if(tab==='ueben')return practice?renderUebung():renderUebenHome();
   session?renderSession():renderHome();
 }
 document.getElementById('tab_learn').onclick=()=>{tab='learn';render()};
+document.getElementById('tab_ueben').onclick=()=>{tab='ueben';render()};
 document.getElementById('tab_cards').onclick=()=>{tab='cards';pendingDelete=null;confirmReset=false;render()};
 document.getElementById('tab_account').onclick=()=>{tab='account';render()};
 render();
