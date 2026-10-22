@@ -29,7 +29,7 @@ img{max-width:100%}
   --accent:#2f5bd3; --accent-ink:#ffffff; --marker:#ffe27a;
   --ok:#1f8a4c; --ok-bg:#e3f4ea; --bad:#c23a32; --bad-bg:#fbe7e5;
   --track:#e4e9f2;
-  --c-prog:#2f5bd3; --c-mathe:#b4521f; --c-graph:#1f7a63; --c-own:#7a4bb5; --c-zeichen:#a3197a;
+  --c-prog:#2f5bd3; --c-mathe:#b4521f; --c-graph:#1f7a63; --c-own:#7a4bb5; --c-zeichen:#a3197a; --c-at:#8a6d00; --c-linux:#3f6b2a;
   --shadow:0 1px 0 rgba(28,42,74,.06),0 8px 24px rgba(28,42,74,.10);
   --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --f-body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
@@ -38,11 +38,11 @@ img{max-width:100%}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --paper:#111827;--grid:#1c2638;--ink:#e6ebf5;--muted:#9aa7c2;--card:#1a2335;--card-ink:#e9eef8;--line:#2c3850;--soft:#141c2c;
   --accent:#7c9cff;--accent-ink:#0d1530;--marker:#f2d35c;--ok:#5fd394;--ok-bg:#163526;--bad:#ff8a80;--bad-bg:#3d1a18;--track:#263149;
-  --c-prog:#7c9cff;--c-mathe:#f09a62;--c-graph:#5cc9a7;--c-own:#c39cf2;--c-zeichen:#f27cc8;--shadow:0 8px 28px rgba(0,0,0,.45);color-scheme:dark}}
+  --c-prog:#7c9cff;--c-mathe:#f09a62;--c-graph:#5cc9a7;--c-own:#c39cf2;--c-zeichen:#f27cc8;--c-at:#e6c14f;--c-linux:#94d07a;--shadow:0 8px 28px rgba(0,0,0,.45);color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#111827;--grid:#1c2638;--ink:#e6ebf5;--muted:#9aa7c2;--card:#1a2335;--card-ink:#e9eef8;--line:#2c3850;--soft:#141c2c;
   --accent:#7c9cff;--accent-ink:#0d1530;--marker:#f2d35c;--ok:#5fd394;--ok-bg:#163526;--bad:#ff8a80;--bad-bg:#3d1a18;--track:#263149;
-  --c-prog:#7c9cff;--c-mathe:#f09a62;--c-graph:#5cc9a7;--c-own:#c39cf2;--c-zeichen:#f27cc8;--shadow:0 8px 28px rgba(0,0,0,.45);color-scheme:dark}
+  --c-prog:#7c9cff;--c-mathe:#f09a62;--c-graph:#5cc9a7;--c-own:#c39cf2;--c-zeichen:#f27cc8;--c-at:#e6c14f;--c-linux:#94d07a;--shadow:0 8px 28px rgba(0,0,0,.45);color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background-color:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
@@ -151,6 +151,20 @@ textarea.ans{min-height:140px;resize:vertical;font-size:1.05rem}
 .sol ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
 .sol li::marker{font-weight:700;color:var(--ok)}
 @media (max-width:440px){.tabs button{padding:8px 11px;font-size:.9rem}}
+/* reiche Rückseite */
+.icard.rich{cursor:pointer;background-image:none}
+.icard.rich .content{align-items:stretch;justify-content:flex-start;text-align:left}
+.icard .term{font-family:var(--f-card);font-size:clamp(1.3rem,4.6vw,1.7rem);font-weight:600;text-align:center;padding:6px 0 10px;border-bottom:2px solid #e7ecf5;overflow-wrap:anywhere}
+.icard .secs{display:flex;flex-direction:column;gap:12px;padding-top:10px}
+.icard .sec{border-left:4px solid #c9d3e4;padding:2px 0 2px 12px}
+.icard .sec p{margin:2px 0 0;font-size:1.02rem;line-height:1.5;overflow-wrap:anywhere}
+.icard .sec.def{border-color:#2f5bd3}.icard .sec.def p{font-family:var(--f-card);font-size:1.08rem}
+.icard .sec.easy{border-color:#1f8a4c}
+.icard .sec.ex{border-color:#d9a400}.icard .sec.ex p{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem}
+.icard .sl{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:#7b879f}
+.icard .src{font-size:.78rem;color:#7b879f;text-align:right}
+.icard .txt.mid{font-family:var(--f-card);font-size:clamp(1.05rem,3.8vw,1.3rem);line-height:1.5;text-align:center}
+.blist .e{font-size:.85rem}
 @media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
 </style>
 </head>
@@ -176,7 +190,9 @@ textarea.ans{min-height:140px;resize:vertical;font-size:1.05rem}
 /* ---------------- Karten aufbereiten ---------------- */
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
 const BUILTIN=[];
-DECKS.forEach(d=>d.themen.forEach(t=>t.cards.forEach(([f,b])=>BUILTIN.push({id:'b'+hash(d.fach+'|'+t.name+'|'+f),fach:d.fach,thema:t.name,front:{text:f,img:''},back:{text:b,img:''},builtin:true}))));
+function srcOf(t,f){f=f||'';if(f[0]==='=')return f.slice(1);if(!f)return t.src||'';return (t.src||'')+(f[0]===','?f:' '+f)}
+function labelOf(src){return /Vorlesung|Seite|Folie/.test(src)?'Laut Folie':/Übung|Aufgabe/.test(src)?'Laut Übungsblatt':/Einführung/.test(src)?'Laut Kurstext':'Bedeutung'}
+DECKS.forEach(d=>d.themen.forEach(t=>t.cards.forEach(([f,b,e,x,q])=>{const src=srcOf(t,q);BUILTIN.push({id:'b'+hash(d.fach+'|'+t.name+'|'+f),fach:d.fach,thema:t.name,front:{text:f,img:''},back:{text:b,img:'',e:e||'',x:x||'',src,lbl:labelOf(src)},builtin:true})})));
 
 /* ---------------- Speicher (pro Benutzer auf dem Gerät) ---------------- */
 const BASE='karteikasten-v2';
@@ -348,6 +364,12 @@ function renderHome(){
   });
 }
 
+function backFace(c){const b=c.back;
+  return `<div class="term">${esc(c.front.text)}</div><div class="secs">
+   <div class="sec def"><span class="sl">${esc(b.lbl)}</span><p>${esc(b.text)}</p></div>
+   ${b.e?`<div class="sec easy"><span class="sl">Einfach gesagt</span><p>${esc(b.e)}</p></div>`:''}
+   ${b.x?`<div class="sec ex"><span class="sl">Beispiel</span><p>${esc(b.x)}</p></div>`:''}
+   ${b.src?`<div class="src">${esc(b.src)}</div>`:''}</div>`}
 function face(side){const t=side.text||'',big=t.length&&t.length<=5&&!side.img;return `${side.img?`<img src="${side.img}" alt="Handschrift">`:''}${t?`<div class="txt${big?' big':''}">${esc(t)}</div>`:''}`}
 
 function renderSession(){
@@ -365,10 +387,13 @@ function renderSession(){
   }
   const q=s.queue[s.i],c=allCards().find(x=>x.id===q.id);
   if(!c){s.i++;return render()}
+  const rich=!!(c.builtin&&c.back.lbl);
   const shown=s.flipped?(q.rev?c.front:c.back):(q.rev?c.back:c.front);
   const isFront=(s.flipped?q.rev:!q.rev);
+  const body=(s.flipped&&rich)?backFace(c):(rich&&q.rev&&!s.flipped)?`<div class="txt mid">${esc(c.back.text)}</div>`:face(shown);
+  const sideLbl=(s.flipped&&rich)?'Lösung':isFront?'Begriff / Zeichen':'Erklärung';
   h+=`<div class="meta"><span class="chip">${esc(s.label)}</span><span>Karte ${s.i+1} von ${s.queue.length} · ✓ ${s.right.length} ✗ ${s.wrong.length}</span></div>
-   <div class="icard${s.flipped?' back':''}" id="card" role="button" tabindex="0" aria-label="Karte umdrehen"><span class="side">${isFront?'Begriff / Zeichen':'Erklärung'}</span><span class="where">${esc(c.thema)}</span><div class="content">${face(shown)}</div></div>`;
+   <div class="icard${s.flipped?' back':''}${s.flipped&&rich?' rich':''}" id="card" role="button" tabindex="0" aria-label="Karte umdrehen"><span class="side">${sideLbl}</span><span class="where">${esc(c.thema)}</span><div class="content">${body}</div></div>`;
   h+=s.flipped?`<div class="answer"><button class="btn bad" id="no">✗ Nicht gewusst</button><button class="btn ok" id="yes">✓ Gewusst</button></div>`:`<p class="hint">Überleg dir die Antwort, dann tipp auf die Karte.</p>`;
   h+=`<button class="btn ghost small" id="stop">Runde beenden</button></div>`;
   view.innerHTML=h;
@@ -423,7 +448,7 @@ function renderCards(){
     h+=`<div class="item"><div class="f">${x.front.img?`<img src="${x.front.img}" alt="">`:''}${esc(x.front.text)}</div><div class="b">${x.back.img?`<img src="${x.back.img}" alt="">`:''}${esc(x.back.text)}<br><span class="note">${esc(x.fach)} · ${esc(x.thema)}</span></div>
       <div class="ops">${del?`<span class="confirm">Löschen? <button type="button" class="btn small bad" data-yes="${x.id}">Ja</button><button type="button" class="btn small" data-no="1">Nein</button></span>`:`<button type="button" class="btn small" data-edit="${x.id}">Ändern</button><button type="button" class="btn small ghost" data-del="${x.id}" aria-label="Löschen">✕</button>`}</div></div>`});
   h+=`</section><section class="panel"><h2>Eingebaute Karten · ${BUILTIN.length}</h2><p class="note">Aus deinen Vorlesungen. Zum Nachschlagen aufklappen.</p>`;
-  DECKS.forEach(d=>{h+=`<details><summary>${esc(d.fach)}</summary>`;d.themen.forEach(t=>{h+=`<h3 style="margin-top:8px">${esc(t.name)}</h3><div class="blist">${t.cards.map(([f,b])=>`<div class="f">${esc(f)}</div><div class="b">${esc(b)}</div>`).join('')}</div>`});h+=`</details>`});
+  DECKS.forEach(d=>{h+=`<details><summary>${esc(d.fach)}</summary>`;d.themen.forEach(t=>{h+=`<h3 style="margin-top:8px">${esc(t.name)}</h3><div class="blist">${t.cards.map(([f,b,e,x,q])=>`<div class="f">${esc(f)}</div><div class="b">${esc(b)}${e?`<br><span class="e">Einfach: ${esc(e)}</span>`:''}${x?`<br><span class="e">Beispiel: ${esc(x)}</span>`:''}<br><span class="note">${esc(srcOf(t,q))}</span></div>`).join('')}</div>`});h+=`</details>`});
   h+=`</section><section class="panel"><h2>Sicherung & Fortschritt</h2>
     <p class="note">Kopiert deine eigenen Karten und deinen Fortschritt als Text, z. B. für eine Notiz.</p>
     <div class="row"><button type="button" class="btn small" id="exp">Sicherung kopieren</button><button type="button" class="btn small" id="impShow">Sicherung einfügen</button></div>
