@@ -209,7 +209,17 @@ const DECKS=[
   [`Größte Zahl mit n Binärstellen`,`2ⁿ − 1`,`Alle Stellen sind 1. Eine 1 mehr wäre schon 2ⁿ.`,`6 Stellen: 111111 = 63 = 2⁶ − 1`,`, Aufgabe 2`],
   [`Wie viele Binärstellen hat 2ⁿ?`,`n + 1`,`Eine 1 und dahinter n Nullen.`,`2³ = 1000 → 4 Stellen`,`, Aufgabe 2`],
   [`Modulo-Funktion`,`Wenn ein Zähler nicht einfach stoppt, wenn sein maximaler Wert erreicht ist, sondern wieder bei 0 beginnt, drücken wir das mit der Modulo-Funktion aus.`,`a mod n ist der Rest, der beim Teilen von a durch n übrig bleibt. Wie eine Uhr, die nach 12 wieder bei 0 anfängt.`,`17 mod 5 = 2, denn 17 = 3 · 5 + 2`,`, Aufgabe 3`],
-  [`x mod 2ᵏ mit der Binärzahl`,`Nur die letzten k Binärstellen behalten.`,`Alle größeren Münzen sind durch 2ᵏ teilbar und fallen beim Rest weg.`,`389 = 110000101 → mod 8 (= 2³): letzte 3 Stellen 101 = 5`,`, Aufgabe 3`]]}
+  [`x mod 2ᵏ mit der Binärzahl`,`Nur die letzten k Binärstellen behalten.`,`Alle größeren Münzen sind durch 2ᵏ teilbar und fallen beim Rest weg.`,`389 = 110000101 → mod 8 (= 2³): letzte 3 Stellen 101 = 5`,`, Aufgabe 3`]]},
+ {name:'Textaufgaben (VL 3)',src:'Mathe 1, Vorlesung 3, Folie',cards:[
+  [`Ein Rätsel modellieren`,`Menge D der Personen festlegen und Funktionen von D nach {W, F} einführen, z. B. g(x) = W, wenn x gestohlen hat, a(x) = W, wenn x die Wahrheit sagt.`,`Jede Person bekommt Schalter: wahr oder falsch.`,`D = {Hutmacher, Hase, Haselmaus}`,`3-3`],
+  [`Strich über einer Aussage`,`Ein Strich über x bedeutet „nicht x“ (¬x).`,`Der Strich dreht wahr und falsch um.`,`g(A) mit Strich = „A hat nicht gestohlen“`,`3-6`],
+  [`Nebeneinander schreiben`,`xy (ohne Zeichen dazwischen) bedeutet x ∧ y.`,`Wie Malnehmen: nebeneinander = und.`,`g(A)g(B) = A und B haben gestohlen`,`3-6`],
+  [`„X sagt …“ übersetzen`,`„X sagt S“ wird zu a(X) = S: Die Aussage ist genau dann wahr, wenn X die Wahrheit sagt.`,`Lügner → seine Aussage ist falsch, Ehrlicher → wahr.`,`„A sagt: B war es“ → a(A) = g(B)`,`3-6`],
+  [`De Morgan (Strich-Form)`,`Strich über (x ∧ y) = x̅ ∨ y̅. Strich über (x ∨ y) = x̅ ∧ y̅.`,`Strich zerbrechen, Zeichen umdrehen (∧ ↔ ∨).`,`nicht (Regen und Wind) = kein Regen oder kein Wind`,`3-7`],
+  [`Annahme und Widerspruch`,`Man nimmt einen Fall an (z. B. a(A) = W), rechnet die Folgen aus und streicht den Fall, wenn ein Widerspruch entsteht.`,`Ausprobieren: Passt es nicht, war die Annahme falsch.`,`Mehl: e(A) = W ⇒ … ⇒ e(A) = F → Widerspruch → Ben war es`,`3-8`],
+  [`verrückt / normal`,`v(x) = W ⇔ a(x) = F: Verrückte glauben nur Falsches. Normale (v(x) = F) glauben nur Wahres.`,`Verrückte liegen immer daneben, Normale immer richtig.`,`Verrückter glaubt „2 + 2 = 5“`,`3-13`],
+  [`„A glaubt X“`,`a(A) = (W = X): A glaubt X genau dann, wenn A normal ist und X wahr, oder A verrückt ist und X falsch.`,`Der Glaube ist richtig, wenn A normal ist.`,`Normale Köchin glaubt nur Wahres`,`3-16`],
+  [`Paradoxon`,`Eine Aussage, bei der beide Fälle (wahr und falsch) zu einem Widerspruch führen.`,`Egal was man annimmt, es geht nicht auf.`,`„Ich glaube, dass ich verrückt bin.“`,`3-22`]]}
 ]},
 
 /* ================================================================ GRAPHEN */
@@ -290,7 +300,30 @@ const DECKS=[
   [`Hamiltonscher Kreis / Graph`,`Sei G zusammenhängend. Existiert in G ein Kreis C, der alle Knoten von G enthält, so heißt C Hamiltonscher Kreis und G Hamiltonscher Graph. (Definition 14)`,`Rundweg, der jeden Knoten genau einmal besucht. Kanten dürfen übrig bleiben. Eselsbrücke: Hamilton = Häuser besuchen.`,`Aufgabe 1.3a: d – h – e – i – b – f – a – g – c – d`,`4.4`],
   [`Euler vs. Hamilton`,`Euler: jede Kante genau einmal (Rundreise 1). Hamilton: jeder Knoten genau einmal (Rundreise 2).`,`Für Euler gibt es einen einfachen Test (Satz 4), für Hamilton nicht. Ein Graph kann das eine sein, ohne das andere zu sein.`,`K₄: nicht Eulersch (Grade 3), aber Hamiltonsch`,`4.5`],
   [`Satz 5 (Dirac)`,`Sei G zusammenhängend mit p ≥ 3 Knoten, so dass für jeden Knoten v gilt: grad v ≥ p/2. Dann besitzt G einen Hamiltonschen Kreis.`,`Ist jeder Knoten mit mindestens der Hälfte aller Knoten verbunden, gibt es sicher einen Hamilton-Kreis. Prüfen: δ ≥ p/2?`,`K₃,₃: 3 ≥ 6/2 → Hamiltonsch, z. B. a – d – b – e – c – f – a`,`4.6`],
-  [`hinreichend, aber nicht notwendig`,`Das Dirac-Kriterium ist hinreichend, aber nicht notwendig.`,`Erfüllt → sicher Hamiltonsch. Nicht erfüllt → man weiß nichts, selbst suchen.`,`Cₙ mit n ≥ 5: Grad 2 < n/2, trotzdem Hamiltonsch`,`4.6`]]}
+  [`hinreichend, aber nicht notwendig`,`Das Dirac-Kriterium ist hinreichend, aber nicht notwendig.`,`Erfüllt → sicher Hamiltonsch. Nicht erfüllt → man weiß nichts, selbst suchen.`,`Cₙ mit n ≥ 5: Grad 2 < n/2, trotzdem Hamiltonsch`,`4.6`]]},
+ {name:'Planare Graphen (Kap. 5)',src:'Graphen, Vorlesung, Seite',cards:[
+  [`Planare Einbettung`,`Eine Zeichnung von G in der Ebene, bei der sich Kanten höchstens in ihren Endknoten berühren, heißt planare Einbettung (ebene Darstellung).`,`So zeichnen, dass sich keine zwei Linien kreuzen.`,`K₄ als Dreieck mit einem Punkt in der Mitte: keine Kreuzung`,`5.2`],
+  [`Planarer Graph`,`Ein Graph heißt planar, wenn er eine planare Einbettung besitzt. (Definition 15)`,`Es reicht, wenn es irgendeine kreuzungsfreie Zeichnung gibt. Eine Zeichnung mit Kreuzung beweist nichts.`,`K₄ ist planar, K₅ nicht`,`5.2`],
+  [`Fläche`,`Eine planare Einbettung zerlegt die Ebene in Gebiete, die Flächen. f = Anzahl der Flächen.`,`Die „Zimmer“, die die Linien einschließen. Mit der Schere ausschneiden: jedes Stück ist eine Fläche.`,`Ein Dreieck C₃ hat f = 2 (innen und außen)`,`5.3`],
+  [`Außenfläche`,`Die unbeschränkte Fläche außerhalb der Zeichnung zählt immer als Fläche mit.`,`Der „Garten“ um das Haus wird mitgezählt. Nie vergessen!`,`Ein Baum hat nur die Außenfläche: f = 1`,`5.3`],
+  [`Satz 6 (Polyederformel von Euler)`,`Für jeden zusammenhängenden planaren Graphen gilt: p − q + f = 2.`,`Knoten minus Kanten plus Flächen ergibt immer 2.`,`Würfel: 8 − 12 + 6 = 2`,`5.4`],
+  [`q ≥ 3f/2`,`In einem planaren Graphen (ohne Mehrfachkanten, q ≥ 3) wird jede Fläche von mindestens 3 Kanten begrenzt, jede Kante grenzt an höchstens 2 Flächen. Also 2q ≥ 3f.`,`Jedes Zimmer braucht mindestens 3 Wände, jede Wand gehört höchstens zu 2 Zimmern.`,`f = 7 → q muss mindestens 10,5 sein`,`5.5`],
+  [`Korollar 2: K₅ ist nicht planar`,`K₅ hat p = 5, q = 10. Wäre er planar, wäre f = 2 − 5 + 10 = 7, dann bräuchte man q ≥ 3 · 7 / 2 = 10,5 > 10. Widerspruch.`,`Für so viele Flächen hat K₅ zu wenig Kanten.`,`Rechenweg: f mit Euler, dann q ≥ 3f/2 prüfen`,`5.5`],
+  [`q ≥ 4f/2 (bipartit)`,`In bipartiten Graphen gibt es keine Dreiecke, jede Fläche hat mindestens 4 Kanten. Also 2q ≥ 4f, d. h. q ≥ 2f.`,`Im bipartiten Graphen sind die kleinsten Zimmer Vierecke.`,`f = 5 → q ≥ 10`,`5.6`],
+  [`Korollar 3: K₃,₃ ist nicht planar`,`K₃,₃ hat p = 6, q = 9. Wäre er planar, wäre f = 2 − 6 + 9 = 5, dann bräuchte man q ≥ 4 · 5 / 2 = 10 > 9. Widerspruch.`,`Drei Häuser an drei Versorger (Wasser, Gas, Strom) ohne Kreuzung: unmöglich.`,`Aufgabe 3.1: K₃,₄ enthält K₃,₃ → auch nicht planar`,`5.6`]]},
+ {name:'Bäume (Kap. 6)',src:'Graphen, Vorlesung, Seite',cards:[
+  [`Wald`,`Ein Graph ohne Kreise heißt Wald. (Definition 16)`,`Lauter Bäume nebeneinander, keine Rundwege.`,`3 einzelne Bäume = ein Wald aus 3 Bäumen (3 Komponenten)`,`6.1`],
+  [`Baum`,`Ein zusammenhängender Wald heißt Baum. (Definition 16)`,`Zusammenhängend und ohne Kreis.`,`Pₙ ist ein Baum, Cₙ nicht`,`6.1`],
+  [`Blatt`,`Ein Knoten vom Grad 1 heißt Blatt. (Definition 17)`,`Ein Endpunkt, an dem nur eine Linie hängt.`,`P₄ hat 2 Blätter: die beiden Enden`,`6.2`],
+  [`Satz 7`,`Jeder Baum mit p ≥ 2 Knoten hat mindestens 2 Blätter.`,`Läuft man den längsten Weg ab, sind beide Enden Blätter.`,`Stern K₁,₄ hat sogar 4 Blätter`,`6.3`],
+  [`Satz 8`,`Ein Baum mit p Knoten hat genau q = p − 1 Kanten.`,`Eine Kante weniger als Knoten. Jedes neue Blatt bringt genau eine Kante mit.`,`Baum mit 10 Knoten → 9 Kanten`,`6.4`],
+  [`Satz 9`,`Für einen Graphen G mit p Knoten sind gleichwertig: G ist ein Baum; G ist zusammenhängend mit q = p − 1; G ist kreisfrei mit q = p − 1; zwischen je zwei Knoten gibt es genau einen Weg.`,`Zwei der Eigenschaften reichen, die dritte folgt automatisch.`,`Zusammenhängend und 7 Knoten, 6 Kanten → Baum`,`6.5`],
+  [`Aufspannender Baum (Spannbaum)`,`Ein Teilgraph von G, der ein Baum ist und alle Knoten von G enthält. (Definition 18)`,`So viele Kanten wegnehmen, bis kein Kreis mehr da ist, aber alles noch verbunden bleibt.`,`Jeder zusammenhängende Graph hat einen Spannbaum, mit p − 1 Kanten`,`6.6`],
+  [`Wurzelbaum`,`Ein Baum, in dem ein Knoten als Wurzel ausgezeichnet ist. (Definition 19)`,`Den Baum an einem Knoten hochheben, der Rest hängt nach unten.`,`Ordnerstruktur: / ist die Wurzel`,`6.7`],
+  [`Vater, Kinder, Geschwister`,`Der Nachbar eines Knotens in Richtung Wurzel ist sein Vater, die Nachbarn weg von der Wurzel sind seine Kinder. Knoten mit demselben Vater sind Geschwister.`,`Wie ein Stammbaum: einer drüber, mehrere drunter, nebeneinander.`,`Wurzel hat keinen Vater`,`6.8`],
+  [`Vorfahre, Nachfahre, innerer Knoten`,`Vorfahren: alle Knoten auf dem Weg zur Wurzel. Nachfahren: alle Knoten darunter. Innere Knoten: Knoten mit Kindern (keine Blätter).`,`Oma ist Vorfahre, Enkel ist Nachfahre. Wer Kinder hat, ist innen.`,`Blätter haben keine Nachfahren`,`6.8`],
+  [`Geordneter Baum`,`Ein Wurzelbaum, bei dem die Kinder jedes Knotens eine feste Reihenfolge (links nach rechts) haben. (Definition 20)`,`Die Reihenfolge der Kinder zählt.`,`Bei 5 − 3 ist wichtig, was links und was rechts steht`,`6.9`],
+  [`Rechenbaum`,`Ein Rechenausdruck als geordneter Baum: innere Knoten sind Operatoren, Blätter sind Zahlen/Variablen.`,`Unten rechnen, Ergebnis nach oben reichen.`,`(2 + 3) · 4: Wurzel ·, links +, rechts 4`,`6.10`]]}
 ]},
 
 /* ================================================================ PROGRAMMIERUNG */
@@ -353,7 +386,22 @@ const DECKS=[
   [`cannot resolve symbol`,`Fehlermeldung, wenn eine Variable benutzt wird, bevor sie deklariert ist. Das Programm ist syntaktisch korrekt, hat aber einen semantischen Fehler. Er wird in der Phase des statischen Semantikchecks erkannt.`,`Java kennt diesen Namen (noch) nicht.`,`symbol : variable res`,`21`],
   [`semantischer Fehler`,`Das Programm ist syntaktisch korrekt (die Grammatik stimmt), aber die Bedeutung stimmt nicht.`,`Richtig geschrieben, aber trotzdem falsch.`,`Variable benutzt, bevor sie deklariert ist`,`21`],
   [`Variablendeklaration mit Initialteil`,`Variablendeklaration und Zuweisung kann man in eine Anweisung zusammenfassen.`,`Schachtel bauen und sofort etwas reinlegen.`,`boolean p = true, q = false;`,`22`],
-  [`Guter Programmierstil`,`Bei der Deklaration immer gleich die Variablen initialisieren.`,`Dann liest man nie aus Versehen eine leere Schachtel.`,`boolean fertig = false;`,`23`]]}
+  [`Guter Programmierstil`,`Bei der Deklaration immer gleich die Variablen initialisieren.`,`Dann liest man nie aus Versehen eine leere Schachtel.`,`boolean fertig = false;`,`23`]]},
+ {name:'Blöcke & if-else (VL 3)',src:'Programmierung I, Vorlesung 3, Folie',cards:[
+  [`Leere Anweisung`,`Ein Semikolon ; allein ist eine Anweisung, die nichts tut.`,`Ein leerer Befehl. Erlaubt, aber nutzlos.`,`;;; sind drei leere Anweisungen`,`3`],
+  [`Block { }`,`Ein Block fasst mehrere Anweisungen in { } zu einer einzigen Anweisung zusammen.`,`Eine Kiste mit mehreren Befehlen, die nach außen als einer zählt.`,`{ a = true; b = false; }`,`5`],
+  [`Sichtbarkeit von Variablen`,`Eine Variable ist ab ihrer Deklaration bis zum } ihres Blocks sichtbar, auch in Unterblöcken.`,`Sie lebt in ihrem Zimmer und in allen Zimmern darin, aber nicht draußen.`,`außen deklariert → innen benutzbar, innen deklariert → außen nicht`,`7`],
+  [`cannot find symbol`,`Fehler: Eine Variable wird benutzt, wo sie nicht (mehr) sichtbar ist.`,`Die Schachtel gibt es hier nicht.`,`{ boolean b = true; } System.out.println(b);`,`8`],
+  [`already defined`,`Fehler: Im Unterblock wird eine Variable mit demselben Namen nochmal deklariert.`,`Den Namen gibt es hier schon.`,`boolean a; { boolean a; }`,`9`],
+  [`if-else`,`if (Bedingung) Anw1 else Anw2: Ist die Bedingung true, wird Anw1 ausgeführt, sonst Anw2.`,`Weggabelung: genau einer der beiden Wege wird gegangen.`,`if (a) System.out.println("ja"); else System.out.println("nein");`,`11`],
+  [`Eine Anweisung pro Zweig`,`Zu if und else gehört jeweils genau eine Anweisung. Für mehrere einen Block { } benutzen.`,`Ohne Klammern gehört nur die erste Zeile zum if.`,`if (a) { x = true; y = true; }`,`15`],
+  [`if ohne else`,`Der else-Teil darf weggelassen werden. Ist die Bedingung false, passiert dann nichts.`,`Nur ein Weg mit Abzweig, sonst geradeaus weiter.`,`if (regen) System.out.println("Schirm!");`,`19`],
+  [`'else' without 'if'`,`Fehler: Zwischen if und else stehen mehrere Anweisungen ohne Block.`,`Das else findet sein if nicht mehr.`,`if (a) x = true; y = true; else …`,`16`],
+  [`dangling else`,`Ein else gehört immer zum letzten if davor, das noch kein else hat. Die Einrückung ist egal.`,`Java schaut nicht auf Leerzeichen. Im Zweifel { } setzen.`,`if (a) if (b) X; else Y; → else gehört zu if (b)`,`23`],
+  [`Reihenfolge ! && ||`,`! bindet am stärksten, dann &&, dann ||.`,`Wie Punkt vor Strich: nicht vor und vor oder.`,`a || b && !c = a || (b && (!c))`,`=Programmierung I, Übung 3`],
+  [`^ (XOR)`,`a ^ b ist true, wenn genau einer von beiden true ist.`,`Entweder-oder, aber nicht beide.`,`true ^ true = false, true ^ false = true`,`=Programmierung I, Übung 3`],
+  [`Implikation a ⇒ b in Java`,`Java hat kein ⇒. Man schreibt !a || b.`,`Nur falsch, wenn das Wenn passiert und das Dann nicht.`,`Regen ⇒ Schirm: !regen || schirm`,`=Programmierung I, Übung 3`],
+  [`Scanner`,`Liest Werte von der Tastatur: import java.util.Scanner; Scanner sc = new Scanner(System.in); boolean a = sc.nextBoolean();`,`Das Programm wartet, bis du etwas eintippst.`,`true eintippen → a ist true`,`=Programmierung I, Übung 3`]]}
 ]},
 
 /* ================================================================ ARBEITSTECHNIKEN */
@@ -434,6 +482,24 @@ const DECKS=[
   [`ssh hopper`,`Verbindet dich mit dem Server Hopper. Dank SSH-Schlüssel und Eintrag in ~/.ssh/config ohne Passwort.`,`Auf den Hochschul-Rechner einloggen.`,`ssh hopper`,``],
   [`Vim: i und Esc`,`i wechselt in den Einfügemodus (tippen), Esc zurück in den Normalmodus (Befehle).`,`i = schreiben, Esc = Befehle geben.`,`i, Text tippen, Esc`,``],
   [`Vim: :w, :q, :wq, :q!`,`:w speichert, :q beendet, :wq speichert und beendet, :q! beendet ohne zu speichern.`,`w = write, q = quit, ! = „egal, raus!“`,`:wq`,``],
-  [`Vim: yy, dd, p, u`,`yy kopiert die Zeile, dd schneidet sie aus, p fügt darunter ein, u macht rückgängig.`,`yank, delete, paste, undo.`,`5yy kopiert 5 Zeilen`,``]]}
+  [`Vim: yy, dd, p, u`,`yy kopiert die Zeile, dd schneidet sie aus, p fügt darunter ein, u macht rückgängig.`,`yank, delete, paste, undo.`,`5yy kopiert 5 Zeilen`,``]]},
+ {name:'Pipes & Skripte (Woche 3)',src:'Einführung in die Informatik, Woche 3',cards:[
+  [`< (Eingabeumleitung)`,`Das Kleiner-Zeichen gibt einem Kommando eine Datei als Eingabe (Stdin).`,`Der Pfeil zeigt in das Kommando hinein: Datei rein.`,`$ tr 'a-z' 'A-Z' < obst.txt`,``],
+  [`| (Pipe)`,`Die Ausgabe des linken Kommandos wird direkt die Eingabe des rechten. Keine Zwischendatei nötig.`,`Ein Rohr von einem Kommando zum nächsten.`,`$ cat obst.txt | sort | uniq`,``],
+  [`tr`,`Übersetzt Zeichen: jedes Zeichen aus der ersten Liste wird durch das passende aus der zweiten ersetzt. Liest nur von Stdin.`,`Buchstaben austauschen. Braucht < oder |.`,`$ tr 'A-Z' 'a-z' < alice.txt (alles klein)`,``],
+  [`tr -c`,`-c (complement) nimmt alle Zeichen, die NICHT in der Liste stehen.`,`Das Gegenteil der Liste.`,`tr -c 'a-zA-Z' '\\n' = alles, was kein Buchstabe ist, wird Zeilenumbruch`,``],
+  [`tr -s`,`-s (squeeze) fasst mehrere gleiche Zeichen hintereinander zu einem zusammen.`,`Viele Leerzeilen werden zu einer.`,`tr -s '\\n' quetscht leere Zeilen weg`,``],
+  [`'\\n'`,`Das Zeichen für den Zeilenumbruch.`,`„Neue Zeile“ als Zeichen.`,`tr ' ' '\\n' → jedes Wort in eine eigene Zeile`,``],
+  [`uniq`,`Fasst gleiche Zeilen, die direkt untereinander stehen, zu einer zusammen. Darum vorher sortieren.`,`Doppelte weg, aber nur Nachbarn.`,`$ sort obst.txt | uniq`,``],
+  [`uniq -c`,`Schreibt vor jede Zeile, wie oft sie vorkam (count).`,`Zählen, wie oft jedes Wort da ist.`,`3 cat / 2 alice`,``],
+  [`McIlroy: 10 häufigste Wörter`,`1. tr -s -c 'a-zA-Z' '\\n' (ein Wort pro Zeile) 2. tr 'A-Z' 'a-z' (klein) 3. sort 4. uniq -c 5. sort -n -r 6. head -n10`,`Zerlegen, klein machen, sortieren, zählen, nach Anzahl sortieren, Top 10.`,`tr -s -c 'a-zA-Z' '\\n' < alice.txt | tr 'A-Z' 'a-z' | sort | uniq -c | sort -n -r | head -n10`,``],
+  [`Skript (.sh) ausführen`,`Befehle in eine Datei schreiben (z. B. mit Vim) und mit bash skript.sh ausführen.`,`Ein Einkaufszettel mit Befehlen, der auf einmal abgearbeitet wird.`,`$ bash mcilroy.sh`,``],
+  [`:! bash in Vim`,`Mit :!bash skript.sh führt man das Skript aus, ohne Vim zu verlassen.`,`Kurz testen, dann weiterschreiben.`,`:!bash mcilroy.sh`,``],
+  [`join`,`Verbindet zwei sortierte Dateien: Zeilen mit demselben Wert in der Verbindungsspalte werden zu einer Zeile.`,`Wie SVERWEIS in Excel: zwei Tabellen über die Matrikelnummer zusammenkleben.`,`1001:anna + 1001:Mathe → 1001:anna:Mathe`,``],
+  [`join -t`,`-t gibt das Trennzeichen an (wie -d bei cut).`,`Sagt join, woran die Spalten getrennt sind.`,`$ join -t ':' a.csv b.csv`,``],
+  [`join: input is not in sorted order`,`join funktioniert nur, wenn beide Dateien nach der Verbindungsspalte sortiert sind.`,`Erst sortieren, dann joinen.`,`sort -t ':' -k1,1 matrikel.csv > m-sort.csv`,``],
+  [`join -1 und -2`,`-1 n: Verbindungsspalte in Datei 1, -2 n: Verbindungsspalte in Datei 2.`,`Wenn die Matrikelnummer nicht in Spalte 1 steht.`,`join -t ':' -1 2 -2 1 a.csv b.csv`,``],
+  [`mv`,`Verschiebt oder benennt eine Datei um.`,`move: Datei woanders hinlegen oder neuen Namen geben.`,`$ mv alt.txt neu.txt`,``],
+  [`&&`,`Führt das zweite Kommando nur aus, wenn das erste geklappt hat.`,`Erst das, und nur wenn es klappt, das.`,`$ javac World.java && java World`,``]]}
 ]}
 ];
